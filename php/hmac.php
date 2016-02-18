@@ -18,9 +18,9 @@ $jsonString = '{
     "surName": "Nehr",
     "email": "gerd.nehr@gmail.com"
   },
-  "description": "Fahrrad Typ ABC",
+  "description": "Mountainbike Type Superfast",
   "repeatable": false,
-  "callbackUrl": "www.blub.de",
+  "callbackUrl": "https://yourcallbackurl.com",
   "status": "offen"
 }';
 
