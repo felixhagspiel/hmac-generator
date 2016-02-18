@@ -1,5 +1,7 @@
 <?php
-//Enter your code here, enjoy!
+/**
+ * PHP implementation for creating HMAC Hashes
+ */
 
 $jsonString = '{
   "customerId": "0012",
@@ -59,7 +61,5 @@ function getHMAC($JSONString, $endpoint, $apiKey)
     ksort($array);
     $request = appendApiKey(createString($array), $endpoint);
     return base64_encode(hash_hmac('sha512', $request, $apiKey, true));
-}
-
-;
+};
 echo(getHMAC($jsonString, "/clients/yourClientId/contracts", "APIKEY"));

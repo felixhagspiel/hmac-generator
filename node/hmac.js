@@ -47,4 +47,4 @@ function getHMAC(json, endpoint, apiKey) {
 }
 
 // `hmac` contains the value you have to set as value for the POST's Authorization Header
-var hmac = getHMAC(json, '/clients/SET001/contracts', 'APIKEY');
+var hmac = getHMAC(json, '/clients/yourClientId/contracts', 'APIKEY');
