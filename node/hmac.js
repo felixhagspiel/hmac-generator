@@ -1,11 +1,11 @@
 /**
- * Node implementation for creating HMAC Hashes
+ * Node example for creating HMAC Hashes
  */
 
 var flatten = require('flat');
 var CryptoJS = require("crypto-js");
 
-// Example JSON
+// Example POST data
 var json = {
   "customerId": "0012",
   "seller": {
@@ -26,8 +26,13 @@ var json = {
   "status": "offen"
 };
 
-
-function getHMAC(json, endpoint, apiKey) {
+/**
+ * @param json        JSON string representing the data you want to send to the endpoint
+ * @param endpoint    The endpoint you want to contact without trailing slash, i.e. "/clients/yourClientId/contracts"
+ * @param secretKey   Your API-Secret. Treat confidentially!
+ * @return string     Returns a Base64 encoded hash
+ */
+function getHMAC(json, endpoint, secretKey) {
   // flatten nested JSON
   var flattenedJSON = flatten(json);
   // get attribute names as array
@@ -40,11 +45,11 @@ function getHMAC(json, endpoint, apiKey) {
     jsonString += flattenedJSON[keys[i]];
   }
   // generate HMAC
-  var hash = CryptoJS.HmacSHA512(jsonString + endpoint, apiKey);
+  var hash = CryptoJS.HmacSHA512(jsonString + endpoint, secretKey);
   // Base64 encode and return
   return CryptoJS.enc.Base64.stringify(hash);
 
 }
 
 // `hmac` contains the value you have to set as value for the POST's Authorization Header
-var hmac = getHMAC(json, '/clients/yourClientId/contracts', 'APIKEY');
+var hmac = getHMAC(json, '/clients/yourClientId/contracts', 'yourApiKey');

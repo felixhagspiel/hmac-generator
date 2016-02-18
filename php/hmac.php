@@ -1,8 +1,9 @@
 <?php
 /**
- * PHP implementation for creating HMAC Hashes
+ * PHP example for creating HMAC Hashes
  */
 
+// Example POST data
 $jsonString = '{
   "customerId": "0012",
   "seller": {
@@ -23,7 +24,13 @@ $jsonString = '{
   "status": "offen"
 }';
 
-function getHMAC($JSONString, $endpoint, $apiKey)
+/**
+ * @param $JSONString   JSON string representing the data you want to send to the endpoint
+ * @param $endpoint     The endpoint you want to contact without trailing slash, i.e. "/clients/yourClientId/contracts"
+ * @param $secretKey    Your API-Secret. Treat confidentially!
+ * @return string       Returns a Base64 encoded hash
+ */
+function getHMAC($JSONString, $endpoint, $secretKey)
 {
     function flatten($obj, $key = null, $path = "")
     {
@@ -60,6 +67,8 @@ function getHMAC($JSONString, $endpoint, $apiKey)
     $array = flatten(json_decode($JSONString));
     ksort($array);
     $request = appendApiKey(createString($array), $endpoint);
-    return base64_encode(hash_hmac('sha512', $request, $apiKey, true));
+    return base64_encode(hash_hmac('sha512', $request, $secretKey, true));
 };
-echo(getHMAC($jsonString, "/clients/yourClientId/contracts", "APIKEY"));
+
+// get a new HMAC hash
+echo(getHMAC($jsonString, "/clients/yourClientId/contracts", "yourApiKey"));
