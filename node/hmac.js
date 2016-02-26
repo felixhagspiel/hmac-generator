@@ -5,25 +5,40 @@
 var flatten = require('flat');
 var CryptoJS = require("crypto-js");
 
-// Example POST data
-var json = {
-  "customerId": "0012",
-  "seller": {
-    "userId": 1006,
-    "firstName": "Mira",
-    "surName": "Bellenbaum",
-    "email": "mira.bellenbaum@gmail.com"
+// This is your API-Key. Treat it confidentially!
+var apiKey = 'yourApiKey';
+
+// This is the API endpoint for the POST request
+var apiEndpoint = '/clients/yourClientId/contracts';
+
+// This is the example JSON data you want to send in your POST request
+var newContractData = {
+  "customId" : "yourCustomContractId" ,
+  "description" : "Rent for office in Millerstreet" ,
+  "repeatable" : false ,
+  "callbackUrl" : "https://yoursite.de/callbacks?orderid=yourOrderId",
+  "sender": {
+    "customId": "yourCustomSenderId",
+    "firstName": "John",
+    "surName": "Doe",
+    "email": "john@doe.com"
   },
-  "buyer": {
-    "userId": 2006,
-    "firstName": "Gerd",
-    "surName": "Nehr",
-    "email": "gerd.nehr@gmail.com"
-  },
-  "description": "Mountainbike Type Superfast",
-  "repeatable": false,
-  "callbackUrl": "https://yourcallbackurl.com",
-  "status": "offen"
+  "recipient": {
+    "customId": "yourCustomRecipientId",
+    "firstName": "Flash",
+    "surName": "Gordon",
+    "email": "flash@gordon.com",
+    "accounts": [
+      {
+        "customId": "yourCustomRecipientAccountId",
+        "firstName": "Flash",
+        "surname": "Gordon",
+        "bankName": "Huge Bank AG",
+        "iban" : "DE1200012030200359100100",
+        "bic" : "COBADEFFXXX"
+      }
+    ]
+  }
 };
 
 /**
@@ -51,5 +66,7 @@ function getHMAC(json, endpoint, secretKey) {
 
 }
 
-// `hmac` contains the value you have to set as value for the POST's Authorization Header
-var hmac = getHMAC(json, '/clients/yourClientId/contracts', 'yourApiKey');
+// `hmac` is the value you have to set for the POST's Authorization Header
+var hmac = getHMAC(newContractData, apiEndpoint, apiKey);
+// The output for the above example should be '7rn6yj2rSl3ET3oIqGDQ9jOzULPvKr7rOTat7pBWOpy8mvRSQn55NgyD2QN1xNdGLXX94Tqobb3q2mTdXPS3YQ=='
+console.log(hmac);
