@@ -3,42 +3,57 @@
  * PHP example for creating HMAC Hashes
  */
 
-// Example POST data
-$jsonString = '{
-  "customerId": "0012",
-  "seller": {
-    "userId": 1006,
-    "firstName": "Mira",
-    "surName": "Bellenbaum",
-    "email": "mira.bellenbaum@gmail.com"
+// This is your API-Key. Treat it confidentially!
+$apiKey = 'yourApiKey';
+
+// This is the API endpoint for the POST request
+$apiEndpoint = '/clients/yourClientId/contracts';
+
+// This is the example JSON data you want to send in your POST request
+$newContractData = '{
+  "customId" : "yourCustomContractId" ,
+  "description" : "Rent for office in Millerstreet" ,
+  "repeatable" : false ,
+  "callbackUrl" : "https://yoursite.de/callbacks?orderid=yourOrderId",
+  "sender": {
+    "customId": "yourCustomSenderId",
+    "firstName": "John",
+    "surName": "Doe",
+    "email": "john@doe.com"
   },
-  "buyer": {
-    "userId": 2006,
-    "firstName": "Gerd",
-    "surName": "Nehr",
-    "email": "gerd.nehr@gmail.com"
-  },
-  "description": "Mountainbike Type Superfast",
-  "repeatable": false,
-  "callbackUrl": "https://yourcallbackurl.com",
-  "status": "offen"
+  "recipient": {
+    "customId": "yourCustomRecipientId",
+    "firstName": "Flash",
+    "surName": "Gordon",
+    "email": "flash@gordon.com",
+    "accounts": [
+      {
+        "customId": "yourCustomRecipientAccountId",
+        "firstName": "Flash",
+        "surname": "Gordon",
+        "bankName": "Huge Bank AG",
+        "iban" : "DE1200012030200359100100",
+        "bic" : "COBADEFFXXX"
+      }
+    ]
+  }
 }';
 
 /**
- * @param $JSONString   JSON string representing the data you want to send to the endpoint
- * @param $endpoint     The endpoint you want to contact without trailing slash, i.e. "/clients/yourClientId/contracts"
- * @param $secretKey    Your API-Secret. Treat confidentially!
- * @return string       Returns a Base64 encoded hash
+ * @param $jsonString  string   JSON string representing the data you want to send to the endpoint
+ * @param $endpoint    string   The endpoint you want to contact without trailing slash, i.e. "/clients/yourClientId/contracts"
+ * @param $secretKey   string   Your API-Secret. Treat confidentially!
+ * @return string               Returns a Base64 encoded hash
  */
-function getHMAC($JSONString, $endpoint, $secretKey)
+function getHMAC($jsonString, $endpoint, $secretKey)
 {
-    function flatten($obj, $key = null, $path = "")
+    function flatten($obj, $path = "")
     {
         $aggregate = array();
-        if (is_object($obj)) {
+        if (is_object($obj) || is_array($obj)) {
 
             foreach ($obj as $key => $value) {
-                $aggregate = array_merge($aggregate, flatten($value, $key, $path ? $path . "." . $key : $key));
+                $aggregate = array_merge($aggregate, flatten($value, $path ? $path . "." . $key : $key));
             }
         } else {
             if (is_bool($obj)) {
@@ -59,16 +74,19 @@ function getHMAC($JSONString, $endpoint, $secretKey)
         return $result;
     }
 
-    function appendApiKey($payload, $path)
+    function appendApiKey($payload, $endpoint)
     {
-        return $payload . $path;
+        return $payload . $endpoint;
     }
 
-    $array = flatten(json_decode($JSONString));
+    $array = flatten(json_decode($jsonString));
     ksort($array);
-    $request = appendApiKey(createString($array), $endpoint);
-    return base64_encode(hash_hmac('sha512', $request, $secretKey, true));
-};
+    $string = createString($array);
+    $string = appendApiKey($string, $endpoint);
+    return base64_encode(hash_hmac('sha512', $string, $secretKey, true));
+}
 
-// get a new HMAC hash
-echo(getHMAC($jsonString, "/clients/yourClientId/contracts", "yourApiKey"));
+// `hmac` is the value you have to set for the POST's Authorization Header
+$hash = getHMAC($newContractData, $apiEndpoint, $apiKey);
+// The output for the above example should be '7rn6yj2rSl3ET3oIqGDQ9jOzULPvKr7rOTat7pBWOpy8mvRSQn55NgyD2QN1xNdGLXX94Tqobb3q2mTdXPS3YQ=='
+echo($hash);
